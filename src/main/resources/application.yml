@@ -1,1 +1,28 @@
+feign:
+  clients:
+    yandexSpeller:
+      url: https://speller.yandex.net/services/spellservice.json
+  httpclient:
+    max-connections: 80
+    max-connections-per-route: 50
+    hc5:
+      socket-timeout: 10000
+      enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: basic
+  autoconfiguration:
+    jackson:
+      enabled: true
 
+app:
+  split-character:
+    syntsc-delimiter: ' '
+    speller-delimiter: '+'
+
+logging:
+  level:
+    com.asvladimirov.syntsc.integration.rest: DEBUG
