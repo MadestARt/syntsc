@@ -15,26 +15,35 @@ public class SentenceTextBuilderServiceImpl implements SentenceTextBuilderServic
 
     @Override
     public String buildSpellerRequest(String sentence) {
-        return sentence.replace(replaceCharacterProperties.getSyntscDelimiter(), replaceCharacterProperties.getSpellerDelimiter());
+        var spellerRequestBuilder = new StringBuilder();
+        var words =sentence.split(" ");
+        for (String word:words) {
+            if (!word.isEmpty()) {
+                spellerRequestBuilder.append(word);
+                spellerRequestBuilder.append(!word.equals(words[words.length - 1]) ? "+" : "");
+            }
+
+        }
+        return spellerRequestBuilder.toString();
     }
 
     @Override
     public String buildFinalSentence(String spellerRequest, List<CertainWordResponse> spellerResponse) {
         var fixedSentenceBuilder = new StringBuilder();
         var words = spellerRequest.split("\\+");
-            int spellerResponseIndex = 0;
-            int wordsIndex = 0;
-            while (wordsIndex < words.length) {
-                var certainWordResponse = spellerResponse.get(spellerResponseIndex);
-                if (certainWordResponse.word().equals(words[wordsIndex])) {
-                    fixedSentenceBuilder.append(certainWordResponse.s().get(0));
-                    spellerResponseIndex++;
-                } else {
-                    fixedSentenceBuilder.append(words[wordsIndex]);
-                }
-                wordsIndex++;
-                fixedSentenceBuilder.append(wordsIndex != words.length ? " " : "");
+        int spellerResponseIndex = 0;
+        int wordsIndex = 0;
+        while (wordsIndex < words.length) {
+            CertainWordResponse certainWordResponse;
+            if (spellerResponseIndex < spellerResponse.size() && (certainWordResponse = spellerResponse.get(spellerResponseIndex)).word().equals(words[wordsIndex])) {
+                fixedSentenceBuilder.append(certainWordResponse.s().get(0));
+                spellerResponseIndex++;
+            } else {
+                fixedSentenceBuilder.append(words[wordsIndex]);
             }
-            return fixedSentenceBuilder.toString();
+            wordsIndex++;
+            fixedSentenceBuilder.append(wordsIndex != words.length ? " " : "");
+        }
+        return fixedSentenceBuilder.toString();
     }
 }
